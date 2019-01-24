@@ -1,0 +1,293 @@
+package book.mvc.model.dao;
+
+import java.sql.*;
+import java.util.ArrayList;
+
+import book.model.vo.Book;
+
+public class BookDao {
+	
+	public BookDao() {}
+	
+	//: 새로운 레코드 정보를 	전달받아 쿼리문에 적용, 테이블에 추가함
+	public int insertBook(Book b) {
+		int result = 0;
+		
+		Connection conn = null;
+		Statement stmt = null;
+		
+		String query = "insert into Book values (seq_bid.nextval, '" 
+						+ b.getTitle() + "', '"
+						+ b.getAuthor() + "', '"
+						+ b.getPublisher() + "', '"
+						+ b.getPublisherDate() + "', "
+						+ b.getPrice() + ")";
+		try {
+			//1.
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+	
+			
+			//2.
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@127.0.0.1:1521:xe", "student", "student");
+			conn.setAutoCommit(false);
+			
+			//3.
+			stmt = conn.createStatement();
+			
+			//4.
+			result = stmt.executeUpdate(query);
+			
+			if(result > 0)
+				conn.commit();
+			else
+				conn.rollback();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				stmt.close();
+				conn.close();
+			} catch (SQLException e) {
+			
+				e.printStackTrace();
+			}		
+		} 
+			
+		return result;		
+	}		
+	//: 수정할 정보를 	전달받아 테이블의 내용 변경함
+	public int updateBook(Book b) {
+		int result = 0;
+		
+		Connection conn = null;
+		Statement stmt = null;
+		
+		String query = "update Book set price = " + b.getPrice() + "where title = '" 
+						+ b.getTitle() + "'";
+		
+		try {
+			//1.
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+	
+			
+			//2.
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@127.0.0.1:1521:xe", "student", "student");
+			conn.setAutoCommit(false);
+			
+			//3.
+			stmt = conn.createStatement();
+			
+			//4.
+			result = stmt.executeUpdate(query);
+			
+			if(result > 0)
+				conn.commit();
+			else
+				conn.rollback();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+		
+			
+		} try {
+			stmt.close();
+			conn.close();
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+			
+		return result;
+	}
+	//: 삭제할 책아이디을 전달받아 	테이블의 정보 삭제함
+	public int deleteBook(int bid) {
+		int result = 0;
+		Connection conn = null;
+		Statement stmt = null;
+		
+		String query = "delete from Book where book_id = " + bid;
+		
+		try {
+			//1.
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			
+			//2.
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@127.0.0.1:1521:xe", "student", "student");
+			conn.setAutoCommit(false);
+			
+			//3.
+			stmt = conn.createStatement();
+			
+			//4.
+			result = stmt.executeUpdate(query);
+			
+			if(result > 0)
+				conn.commit();
+			else
+				conn.rollback();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				stmt.close();
+				conn.close();				
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+				
+		return result;
+	
+	}
+	//: 테이블의 모든 정보를 조회해서 리스트에 담아 리턴함
+	public ArrayList<Book> selectAllBooks() {
+		ArrayList<Book> bookList = new ArrayList<Book>();
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rset = null;
+		
+		String query = "select * from book";
+		
+		try {
+			//1.
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			
+			//2.
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@127.0.0.1:1521:xe", "student", "student");
+			
+			//3.
+			stmt = conn.createStatement();
+			
+			//4.
+			rset = stmt.executeQuery(query);
+			
+			while(rset.next()) {
+				Book b = new Book();
+				b.setBookId(rset.getInt("book_id"));
+				b.setTitle(rset.getString("title"));
+				b.setAuthor(rset.getString("author"));
+				b.setPublisher(rset.getString("publisher"));
+				b.setPublisherDate(rset.getDate("publisher_date"));
+				b.setPrice(rset.getInt("price"));
+				
+				bookList.add(b);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			
+		} try {
+			rset.close();
+			stmt.close();
+			conn.close();			
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+		
+		return bookList;
+	}
+	//: 책제목을 넘겨받아, 해당 도서조회해서 리스트에 담아 리턴
+	public ArrayList<Book> searchBookTitle(String bookTitle) {
+		ArrayList<Book> bookList = new ArrayList<Book>();
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rset = null;
+		
+		String query = "select * from book where title like '%" + bookTitle + "%'";
+		
+		try {
+			//1.
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			
+			//2.
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@127.0.0.1:1521:xe", "student", "student");
+			
+			//3.
+			stmt = conn.createStatement();
+			
+			//4.
+			rset = stmt.executeQuery(query);
+			
+			while(rset.next()) {
+				Book b = new Book();
+				b.setBookId(rset.getInt("book_id"));
+				b.setTitle(rset.getString("title"));
+				b.setAuthor(rset.getString("author"));
+				b.setPublisher(rset.getString("publisher"));
+				b.setPublisherDate(rset.getDate("publisher_date"));
+				b.setPrice(rset.getInt("price"));
+				
+				bookList.add(b);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			
+		} try {
+			rset.close();
+			stmt.close();
+			conn.close();			
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+		
+		return bookList;
+	} 
+	//: 책 아이디를 전달받아 해당 도서 조회해서 객체에 담아 리턴 
+	public Book selectBook(int bid) {
+		
+		Book b = null;
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rset = null;
+		
+		String query = "select * from Book where book_id = " + bid;
+		
+		try {
+			//1.
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			
+			//2.
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@127.0.0.1:1521:xe", "student", "student");
+
+			
+			//3.
+			stmt = conn.createStatement();
+			
+			rset = stmt.executeQuery(query);
+			
+			while(rset.next()) {
+				b = new Book();
+				b.setBookId(bid);
+				b.setTitle(rset.getString("title"));
+				b.setAuthor(rset.getString("author"));
+				b.setPublisher(rset.getString("publisher"));
+				b.setPublisherDate(rset.getDate("publisher_date"));
+				b.setPrice(rset.getInt("price"));
+				
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			
+		} try {
+			rset.close();
+			stmt.close();
+			conn.close();			
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+		
+		return b;
+		
+	}
+	
+
+}
