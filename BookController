@@ -1,0 +1,96 @@
+package book.mvc.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import book.model.vo.Book;
+import book.mvc.model.dao.BookDao;
+import book.mvc.view.BookMenu;
+
+public class BookController {
+
+	//default 생성자
+	public BookController() {}
+	
+	private BookDao bdao = new BookDao();
+	
+	//  => dao의 insertBook(b) 호출
+	public void insertBook(Book b) {
+		int result = bdao.insertBook(b);
+		
+		if(result > 0)
+			System.out.print("\nBook 객체 등록 성공");
+		else 
+			System.out.print("\nBook 객체 등록 실패");
+			System.out.print("\n");
+		return;
+			
+	}
+	//=> dao의 updateBook(b) 호출
+	public void updateBook(Book b) {
+		int result = bdao.updateBook(b);
+		
+		if(result > 0)
+			System.out.print("\n도서 정보 수정 성공");
+		else 
+			System.out.print("\n도서 정보 수정 실패");
+			System.out.print("\n다시 입력 해주세요.");
+		return;
+		
+	} 
+	//=> dao의 deleteBook(bid) 호출
+	public void deleteBook(int bid) {
+		int result = bdao.deleteBook(bid);
+		if(result > 0)
+			System.out.print("\n도서 삭제 성공");
+		else 
+			System.out.print("\n도서 삭제 실패");
+			System.out.print("\n다시 입력 해주세요.");
+			return;
+	}
+	
+	//dao의 selectBook(bid) 호출
+	public Book searchBook(int bid) {
+		Book b = bdao.selectBook(bid);
+		
+		if(b == null) {System.out.println("검색한 도서가 존재하지 않습니다. 다시 입력 해주세요.");
+			new BookMenu().displayMenu();
+			}
+			
+		return b;
+		
+	}
+	
+	//=> dao의 searchBookTitle(bookTitle) 호출
+	public void searchBookTitle(String bookTitle) {
+		ArrayList<Book> bookList = bdao.searchBookTitle(bookTitle);
+		
+		if(bookList.isEmpty()) {
+			System.out.println("검색한 도서가 존재하지 않습니다. 다시 입력 해주세요.");
+			new BookMenu().displayMenu();
+		}
+		else {
+			for(Book b : bookList)
+			System.out.println(b/*.toString()*/);
+		}
+			
+			return;
+		
+	}
+	//=> dao의 selectAllBooks() 호출	
+	public List<Book> selectAll() {
+		List<Book> bookList = bdao.selectAllBooks();
+		
+		if(bookList.isEmpty()) {
+			System.out.println("검색한 도서가 존재하지 않습니다. 다시 입력 해주세요.");
+			new BookMenu().displayMenu();
+		}
+		
+		return bookList;
+	}
+
+	/** dao 의 메소드 실행하고 리턴된 결과에 따라
+	  성공시에는 BookMenu 의 출력용 메소드가 작동되게하고,
+	  실패시에는 에러메세지를 넘겨 출력되게 메소드 실행함	*/
+	
+}
